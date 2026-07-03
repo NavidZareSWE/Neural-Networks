@@ -48,7 +48,6 @@ def run_cgan(data_dir):
     config = {
         'latent_dim': 100,
         'num_classes': 10,
-        'num_classes': 10,
         'batch_size': 128,
         'num_epochs': 15,
         'lr_g': 0.0002,

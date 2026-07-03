@@ -342,6 +342,8 @@ class Dropout:
         return x
 
     def backward(self, dout):
+        if not self.training:
+            return dout
         return dout * self.mask / (1.0 - self.drop_rate)
 
     def params_and_grads(self):

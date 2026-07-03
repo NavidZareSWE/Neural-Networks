@@ -116,13 +116,11 @@ def train_cgan(images, labels, config):
 
             fake_imgs = generator.forward(z, gen_lbls)
 
-            discriminator.set_training(False)
             d_out = discriminator.forward(fake_imgs, gen_lbls)
             g_loss = bce.forward(d_out, np.ones((bs, 1)))
             g_grad = bce.backward()
 
             d_img_grad = discriminator.backward(g_grad)
-            discriminator.set_training(True)
 
             generator.backward(d_img_grad)
             opt_g.step(generator.get_layers())
