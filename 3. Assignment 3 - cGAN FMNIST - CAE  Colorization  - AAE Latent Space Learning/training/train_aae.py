@@ -41,8 +41,10 @@ def train_aae(train_rgb, test_rgb, config):
     mse_loss = MSELoss()
     bce_loss = BCELoss()
 
-    ae_params = sum(p.size for l in model.get_autoencoder_layers() for p, _, _ in l.params_and_grads())
-    disc_params = sum(p.size for l in model.get_discriminator_layers() for p, _, _ in l.params_and_grads())
+    ae_params = sum(p.size for l in model.get_autoencoder_layers()
+                    for p, _, _ in l.params_and_grads())
+    disc_params = sum(p.size for l in model.get_discriminator_layers()
+                      for p, _, _ in l.params_and_grads())
     print(f"  Autoencoder params:   {ae_params:,}")
     print(f"  Discriminator params: {disc_params:,}")
     print(f"  Total params:         {ae_params + disc_params:,}")
@@ -76,9 +78,9 @@ def train_aae(train_rgb, test_rgb, config):
             x_batch = train_data[start:end]
             bs = end - start
 
-            # =========================================================
+            # ---------------------------------------------------------
             # Phase 1: Reconstruction (update encoder + decoder)
-            # =========================================================
+            # ---------------------------------------------------------
             x_hat, z = model.forward(x_batch)
             r_loss = mse_loss.forward(x_hat, x_batch)
 
@@ -87,9 +89,9 @@ def train_aae(train_rgb, test_rgb, config):
             model.encode_backward(dz_recon)
             opt_ae.step(model.get_autoencoder_layers())
 
-            # =========================================================
+            # ---------------------------------------------------------
             # Phase 2: Discriminator (update discriminator only)
-            # =========================================================
+            # ---------------------------------------------------------
             z_fake = model.encode(x_batch)
             z_real = np.random.randn(bs, model.latent_dim).astype(np.float32)
 
@@ -109,9 +111,9 @@ def train_aae(train_rgb, test_rgb, config):
 
             d_loss = 0.5 * (d_loss_real + d_loss_fake)
 
-            # =========================================================
+            # ---------------------------------------------------------
             # Phase 3: Generator / Encoder (fool discriminator)
-            # =========================================================
+            # ---------------------------------------------------------
             z_fake = model.encode(x_batch)
             d_fake = model.discriminate(z_fake)
             labels_real = np.ones((bs, 1))
@@ -148,7 +150,8 @@ def train_aae(train_rgb, test_rgb, config):
               f"Time: {elapsed:.1f}s | Total: {total_elapsed:.0f}s")
 
     total_time = time.time() - total_start
-    print(f"\n  Training completed in {total_time:.1f}s ({total_time/60:.1f} min)")
+    print(
+        f"\n  Training completed in {total_time:.1f}s ({total_time/60:.1f} min)")
     print(f"  Final Recon Loss:   {history['recon_losses'][-1]:.6f}")
     print(f"  Final Val Loss:     {history['val_losses'][-1]:.6f}")
     print(f"  Final Disc Loss:    {history['disc_losses'][-1]:.6f}")
