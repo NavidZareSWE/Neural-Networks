@@ -1,0 +1,6 @@
+torch
+torch_geometric
+rdkit
+selfies
+matplotlib
+numpy
